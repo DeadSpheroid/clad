@@ -101,9 +101,15 @@ namespace clad {
     };
 
     CladPlugin::CladPlugin(CompilerInstance& CI, DifferentiationOptions& DO)
-        : m_CI(CI), m_DO(DO), m_HasRuntime(false) {
+        : m_CI(CI), m_DO(DO), m_HasRuntime(false), m_tg("Clad timers", "Timers for clad funcs"){
 #if CLANG_VERSION_MAJOR > 8
-
+      const clang::CommentOptions::BlockCommandNamesTy cmdargs = m_CI.getCodeGenOpts().CommandLineArgs;
+      for(const std::string &arg: cmdargs){
+        if(arg == "-ftime-report") {
+          m_PrintTimings = true;
+          break;
+        }
+      }
       FrontendOptions& Opts = CI.getFrontendOpts();
       // Find the path to clad.
       llvm::StringRef CladSoPath;
@@ -162,6 +168,7 @@ namespace clad {
 
       for (DiffRequest& request : requests)
         ProcessDiffRequest(request);
+
       return true; // Happiness
     }
 
@@ -231,6 +238,10 @@ namespace clad {
         bool WantTiming = getenv("LIBCLAD_TIMING");
         SimpleTimer Timer(WantTiming);
         Timer.setOutput("Generation time for " + FD->getNameAsString());
+        llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
+        if(m_PrintTimings && !tm.isRunning()){
+          tm.startTimer();
+        }
 
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
@@ -241,6 +252,9 @@ namespace clad {
           auto deriveResult = m_DerivativeBuilder->Derive(request);
           DerivativeDecl = deriveResult.derivative;
           OverloadedDerivativeDecl = deriveResult.overload;
+        }
+        if(m_PrintTimings && tm.isRunning()){
+          tm.stopTimer();
         }
       }
 

@@ -21,6 +21,7 @@
 
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/Timer.h"
 
 namespace clang {
   class ASTContext;
@@ -89,6 +90,8 @@ namespace clad {
       bool m_HasRuntime = false;
       bool m_PendingInstantiationsInFlight = false;
       bool m_HandleTopLevelDeclInternal = false;
+      bool m_PrintTimings = false;
+      llvm::TimerGroup m_tg;
       DerivedFnCollector m_DFC;
     public:
       CladPlugin(clang::CompilerInstance& CI, DifferentiationOptions& DO);
