@@ -101,7 +101,7 @@ namespace clad {
     };
 
     CladPlugin::CladPlugin(CompilerInstance& CI, DifferentiationOptions& DO)
-        : m_CI(CI), m_DO(DO), m_HasRuntime(false), m_tg("Clad timers", "Timers for clad funcs"){
+        : m_CI(CI), m_DO(DO), m_HasRuntime(false), m_TG("Clad timers", "Timers for clad funcs"){
 #if CLANG_VERSION_MAJOR > 8
       const clang::CommentOptions::BlockCommandNamesTy cmdargs = m_CI.getCodeGenOpts().CommandLineArgs;
       for(const std::string &arg: cmdargs){
@@ -165,7 +165,8 @@ namespace clad {
         S.PerformPendingInstantiations();
         m_PendingInstantiationsInFlight = false;
       }
-      llvm::Timer dummy("Dummy timer", "Prevent premature printing of timings", m_tg);
+      // Necessary to prevent separate timing reports due to expired timers
+      llvm::Timer dummy("Dummy timer", "Prevent premature printing of timings", m_TG);
       for (DiffRequest& request : requests)
         ProcessDiffRequest(request);
       return true; // Happiness
@@ -244,7 +245,8 @@ namespace clad {
           OverloadedDerivativeDecl = DFI.OverloadedDerivedFn();
           alreadyDerived = true;
         } else {
-          llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
+          // Only time the function when it is first encountered
+          llvm::Timer tm("Clad timer", request.BaseFunctionName, m_TG);
           if(m_PrintTimings && !tm.isRunning()){
             tm.startTimer();
           }
