@@ -19,8 +19,8 @@
 #include "clang/Basic/Version.h"
 #include "clang/Frontend/FrontendPluginRegistry.h"
 
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Timer.h"
 
 namespace clang {
@@ -90,7 +90,6 @@ namespace clad {
       bool m_HasRuntime = false;
       bool m_PendingInstantiationsInFlight = false;
       bool m_HandleTopLevelDeclInternal = false;
-      bool m_PrintTimings = false;
       llvm::TimerGroup m_TG;
       DerivedFnCollector m_DFC;
     public:
