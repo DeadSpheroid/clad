@@ -244,16 +244,16 @@ namespace clad {
           OverloadedDerivativeDecl = DFI.OverloadedDerivedFn();
           alreadyDerived = true;
         } else {
-              llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
-              if(m_PrintTimings && !tm.isRunning()){
-                tm.startTimer();
-              }
-              auto deriveResult = m_DerivativeBuilder->Derive(request);
-              DerivativeDecl = deriveResult.derivative;
-              OverloadedDerivativeDecl = deriveResult.overload;
-              if(m_PrintTimings && tm.isRunning()){
-                tm.stopTimer();
-              }
+          llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
+          if(m_PrintTimings && !tm.isRunning()){
+            tm.startTimer();
+          }
+          auto deriveResult = m_DerivativeBuilder->Derive(request);
+          DerivativeDecl = deriveResult.derivative;
+          OverloadedDerivativeDecl = deriveResult.overload;
+          if(m_PrintTimings && tm.isRunning()){
+            tm.stopTimer();
+          }
         }
       }
 
