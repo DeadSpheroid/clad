@@ -165,10 +165,11 @@ namespace clad {
         S.PerformPendingInstantiations();
         m_PendingInstantiationsInFlight = false;
       }
-
+      llvm::Timer dummy("Dummy timer", "Prevent premature printing of timings", m_tg);
       for (DiffRequest& request : requests)
+        {
         ProcessDiffRequest(request);
-
+        }
       return true; // Happiness
     }
 
@@ -238,25 +239,27 @@ namespace clad {
         bool WantTiming = getenv("LIBCLAD_TIMING");
         SimpleTimer Timer(WantTiming);
         Timer.setOutput("Generation time for " + FD->getNameAsString());
-        llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
-        if(m_PrintTimings && !tm.isRunning()){
-          tm.startTimer();
-        }
-
+        
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
           DerivativeDecl = DFI.DerivedFn();
           OverloadedDerivativeDecl = DFI.OverloadedDerivedFn();
           alreadyDerived = true;
-        } else {
-          auto deriveResult = m_DerivativeBuilder->Derive(request);
-          DerivativeDecl = deriveResult.derivative;
-          OverloadedDerivativeDecl = deriveResult.overload;
-        }
-        if(m_PrintTimings && tm.isRunning()){
-          tm.stopTimer();
+        } 
+        else {
+            llvm::Timer tm("Clad timer", request.BaseFunctionName, m_tg);
+            if(m_PrintTimings && !tm.isRunning()){
+              tm.startTimer();
+            }
+            auto deriveResult = m_DerivativeBuilder->Derive(request);
+            DerivativeDecl = deriveResult.derivative;
+            OverloadedDerivativeDecl = deriveResult.overload;
+            if(m_PrintTimings && tm.isRunning()){
+              tm.stopTimer();
+            }
         }
       }
+        
 
       if (DerivativeDecl) {
         if (!alreadyDerived) {
