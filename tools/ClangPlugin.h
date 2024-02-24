@@ -61,14 +61,15 @@ namespace clad {
     /// object that represents the same derivative object as the provided
     /// argument `DFI`.
     bool AlreadyExists(const DerivedFnInfo& DFI) const;
-
   };
   class CladTimerGroup {
     llvm::TimerGroup Tg;
     std::vector<std::shared_ptr<llvm::Timer>> Timers;
-    public:
+
+  public:
     CladTimerGroup();
-    std::shared_ptr<llvm::Timer> GetNewTimer(const llvm::StringRef TimerName, const llvm::StringRef TimerDesc);
+    std::shared_ptr<llvm::Timer> GetNewTimer(const llvm::StringRef TimerName,
+                                             const llvm::StringRef TimerDesc);
   } ctg;
 
   namespace plugin {

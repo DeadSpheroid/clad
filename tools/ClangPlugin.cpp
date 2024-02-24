@@ -59,7 +59,6 @@ namespace {
       }
     }
   };
-
 }
 
 namespace clad {
@@ -239,17 +238,16 @@ namespace clad {
           alreadyDerived = true;
         } else {
           // Only time the function when it is first encountered
-          std::shared_ptr<llvm::Timer> tm = ctg.GetNewTimer("Timer for clad func", request.BaseFunctionName);
-          if(m_CI.getCodeGenOpts().TimePasses){
+          std::shared_ptr<llvm::Timer> tm =
+              ctg.GetNewTimer("Timer for clad func", request.BaseFunctionName);
+          if (m_CI.getCodeGenOpts().TimePasses)
             tm->startTimer();
-          }
 
           auto deriveResult = m_DerivativeBuilder->Derive(request);
           DerivativeDecl = deriveResult.derivative;
           OverloadedDerivativeDecl = deriveResult.overload;
-          if(tm->isRunning()){
-          tm->stopTimer();
-          }
+          if (tm->isRunning())
+            tm->stopTimer();
         }
       }
 
@@ -347,16 +345,18 @@ namespace clad {
     }
   } // end namespace plugin
 
+  clad::CladTimerGroup::CladTimerGroup()
+      : Tg("Timers for Clad Funcs", "Timers for Clad Funcs") {}
 
-  clad::CladTimerGroup::CladTimerGroup(): Tg("Timers for Clad Funcs", "Timers for Clad Funcs"){
-  }
-
-  std::shared_ptr<llvm::Timer> clad::CladTimerGroup::GetNewTimer(const llvm::StringRef TimerName, const llvm::StringRef TimerDesc){
-    std::shared_ptr<llvm::Timer> tm = std::make_shared<llvm::Timer>(TimerName, TimerDesc, Tg);
+  std::shared_ptr<llvm::Timer>
+  clad::CladTimerGroup::GetNewTimer(const llvm::StringRef TimerName,
+                                    const llvm::StringRef TimerDesc) {
+    std::shared_ptr<llvm::Timer> tm =
+        std::make_shared<llvm::Timer>(TimerName, TimerDesc, Tg);
     Timers.push_back(tm);
     return tm;
   }
-  
+
   // Routine to check clang version at runtime against the clang version for
   // which clad was built.
   bool checkClangVersion() {
