@@ -198,7 +198,7 @@ namespace clad {
         // FIXME: Move the timing inside the DerivativeBuilder. This would
         // require to pass in the DifferentiationOptions in the DiffPlan.
         // derive the collected functions
-        bool WantTiming = getenv("LIBCLAD_TIMING");
+        bool WantTiming = getenv("LIBCLAD_TIMING") || m_CI.getCodeGenOpts().TimePasses;
 
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
@@ -207,16 +207,15 @@ namespace clad {
           alreadyDerived = true;
         } else {
           // Only time the function when it is first encountered
-          std::shared_ptr<llvm::Timer> tm =
-              ctg.GetNewTimer("Timer for clad func", request.BaseFunctionName);
-          if (m_CI.getCodeGenOpts().TimePasses || WantTiming)
-            tm->startTimer();
+          if (WantTiming)
+            ctg.StartNewTimer("Timer for clad func", request.BaseFunctionName);
+            
 
           auto deriveResult = m_DerivativeBuilder->Derive(request);
           DerivativeDecl = deriveResult.derivative;
           OverloadedDerivativeDecl = deriveResult.overload;
-          if (tm->isRunning())
-            tm->stopTimer();
+          if (WantTiming)
+            ctg.StopTimer();
         }
       }
 
@@ -317,13 +316,20 @@ namespace clad {
   clad::CladTimerGroup::CladTimerGroup()
       : Tg("Timers for Clad Funcs", "Timers for Clad Funcs") {}
 
-  std::shared_ptr<llvm::Timer>
-  clad::CladTimerGroup::GetNewTimer(const llvm::StringRef TimerName,
+  void
+  clad::CladTimerGroup::StartNewTimer(const llvm::StringRef TimerName,
                                     const llvm::StringRef TimerDesc) {
-    std::shared_ptr<llvm::Timer> tm =
-        std::make_shared<llvm::Timer>(TimerName, TimerDesc, Tg);
-    Timers.push_back(tm);
-    return tm;
+    std::unique_ptr<llvm::Timer> tm =
+        std::make_unique<llvm::Timer>(TimerName, TimerDesc, Tg);
+    Timers.push_back(std::move(tm));
+    Timers.back()->startTimer();
+    return;
+  }
+  void clad::CladTimerGroup::StopTimer(){
+    Timers.back()->stopTimer();
+    if(Timers.size() != 1)
+      Timers.pop_back();
+    return;
   }
 
   // Routine to check clang version at runtime against the clang version for

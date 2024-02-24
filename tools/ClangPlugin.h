@@ -64,12 +64,13 @@ namespace clad {
   };
   class CladTimerGroup {
     llvm::TimerGroup Tg;
-    std::vector<std::shared_ptr<llvm::Timer>> Timers;
+    std::vector<std::unique_ptr<llvm::Timer>> Timers;
 
   public:
     CladTimerGroup();
-    std::shared_ptr<llvm::Timer> GetNewTimer(const llvm::StringRef TimerName,
+    void StartNewTimer(const llvm::StringRef TimerName,
                                              const llvm::StringRef TimerDesc);
+    void StopTimer();
   } ctg;
 
   namespace plugin {
