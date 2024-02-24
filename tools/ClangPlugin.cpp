@@ -32,34 +32,6 @@
 
 using namespace clang;
 
-namespace {
-  class SimpleTimer {
-    bool WantTiming;
-    llvm::TimeRecord Start;
-    std::string Output;
-
-  public:
-    explicit SimpleTimer(bool WantTiming) : WantTiming(WantTiming) {
-      if (WantTiming)
-        Start = llvm::TimeRecord::getCurrentTime();
-    }
-
-    void setOutput(const Twine &Output) {
-      if (WantTiming)
-        this->Output = Output.str();
-    }
-
-    ~SimpleTimer() {
-      if (WantTiming) {
-        llvm::TimeRecord Elapsed = llvm::TimeRecord::getCurrentTime();
-        Elapsed -= Start;
-        llvm::errs() << Output << ": user | system | process | all :";
-        Elapsed.print(Elapsed, llvm::errs());
-        llvm::errs() << '\n';
-      }
-    }
-  };
-}
 
 namespace clad {
   namespace plugin {
@@ -228,9 +200,7 @@ namespace clad {
         // require to pass in the DifferentiationOptions in the DiffPlan.
         // derive the collected functions
         bool WantTiming = getenv("LIBCLAD_TIMING");
-        SimpleTimer Timer(WantTiming);
-        Timer.setOutput("Generation time for " + FD->getNameAsString());
-
+        
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
           DerivativeDecl = DFI.DerivedFn();
@@ -240,7 +210,7 @@ namespace clad {
           // Only time the function when it is first encountered
           std::shared_ptr<llvm::Timer> tm =
               ctg.GetNewTimer("Timer for clad func", request.BaseFunctionName);
-          if (m_CI.getCodeGenOpts().TimePasses)
+          if (m_CI.getCodeGenOpts().TimePasses || WantTiming)
             tm->startTimer();
 
           auto deriveResult = m_DerivativeBuilder->Derive(request);
