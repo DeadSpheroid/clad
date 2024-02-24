@@ -98,7 +98,6 @@ namespace clad {
       bool m_HasRuntime = false;
       bool m_PendingInstantiationsInFlight = false;
       bool m_HandleTopLevelDeclInternal = false;
-      llvm::TimerGroup m_TG;
       DerivedFnCollector m_DFC;
     public:
       CladPlugin(clang::CompilerInstance& CI, DifferentiationOptions& DO);

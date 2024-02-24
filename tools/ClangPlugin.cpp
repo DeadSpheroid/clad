@@ -102,8 +102,7 @@ namespace clad {
     };
 
     CladPlugin::CladPlugin(CompilerInstance& CI, DifferentiationOptions& DO)
-        : m_CI(CI), m_DO(DO), m_HasRuntime(false),
-          m_TG("Clad timers", "Timers for clad funcs") {
+        : m_CI(CI), m_DO(DO), m_HasRuntime(false) {
 #if CLANG_VERSION_MAJOR > 8
       FrontendOptions& Opts = CI.getFrontendOpts();
       // Find the path to clad.
@@ -160,9 +159,7 @@ namespace clad {
         S.PerformPendingInstantiations();
         m_PendingInstantiationsInFlight = false;
       }
-      // Necessary to prevent separate timing reports due to expired timers
-      // llvm::Timer dummy("Dummy timer", "Prevent premature printing of timings",
-      //                   m_TG);
+
       for (DiffRequest& request : requests)
         ProcessDiffRequest(request);
       return true; // Happiness
