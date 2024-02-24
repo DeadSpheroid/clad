@@ -32,7 +32,6 @@
 
 using namespace clang;
 
-
 namespace clad {
   namespace plugin {
     /// Keeps track if we encountered #pragma clad on/off.
@@ -200,7 +199,7 @@ namespace clad {
         // require to pass in the DifferentiationOptions in the DiffPlan.
         // derive the collected functions
         bool WantTiming = getenv("LIBCLAD_TIMING");
-        
+
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
           DerivativeDecl = DFI.DerivedFn();
