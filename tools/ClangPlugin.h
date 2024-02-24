@@ -69,7 +69,7 @@ namespace clad {
   public:
     CladTimerGroup();
     void StartNewTimer(const llvm::StringRef TimerName,
-                                             const llvm::StringRef TimerDesc);
+                       const llvm::StringRef TimerDesc);
     void StopTimer();
   } ctg;
 
