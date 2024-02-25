@@ -209,13 +209,14 @@ namespace clad {
         } else {
           // Only time the function when it is first encountered
           if (WantTiming)
-            ctg.StartNewTimer("Timer for clad func", request.BaseFunctionName);
+            m_CTG.StartNewTimer("Timer for clad func",
+                                request.BaseFunctionName);
 
           auto deriveResult = m_DerivativeBuilder->Derive(request);
           DerivativeDecl = deriveResult.derivative;
           OverloadedDerivativeDecl = deriveResult.overload;
           if (WantTiming)
-            ctg.StopTimer();
+            m_CTG.StopTimer();
         }
       }
 
@@ -314,12 +315,12 @@ namespace clad {
   } // end namespace plugin
 
   clad::CladTimerGroup::CladTimerGroup()
-      : Tg("Timers for Clad Funcs", "Timers for Clad Funcs") {}
+      : m_Tg("Timers for Clad Funcs", "Timers for Clad Funcs") {}
 
   void clad::CladTimerGroup::StartNewTimer(const llvm::StringRef TimerName,
                                            const llvm::StringRef TimerDesc) {
     std::unique_ptr<llvm::Timer> tm =
-        std::make_unique<llvm::Timer>(TimerName, TimerDesc, Tg);
+        std::make_unique<llvm::Timer>(TimerName, TimerDesc, m_Tg);
     Timers.push_back(std::move(tm));
     Timers.back()->startTimer();
     return;

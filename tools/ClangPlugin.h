@@ -63,7 +63,7 @@ namespace clad {
     bool AlreadyExists(const DerivedFnInfo& DFI) const;
   };
   class CladTimerGroup {
-    llvm::TimerGroup Tg;
+    llvm::TimerGroup m_Tg;
     std::vector<std::unique_ptr<llvm::Timer>> Timers;
 
   public:
@@ -71,7 +71,7 @@ namespace clad {
     void StartNewTimer(const llvm::StringRef TimerName,
                        const llvm::StringRef TimerDesc);
     void StopTimer();
-  } ctg;
+  };
 
   namespace plugin {
     struct DifferentiationOptions {
@@ -100,6 +100,7 @@ namespace clad {
       bool m_HasRuntime = false;
       bool m_PendingInstantiationsInFlight = false;
       bool m_HandleTopLevelDeclInternal = false;
+      CladTimerGroup m_CTG;
       DerivedFnCollector m_DFC;
     public:
       CladPlugin(clang::CompilerInstance& CI, DifferentiationOptions& DO);
