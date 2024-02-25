@@ -317,8 +317,8 @@ namespace clad {
   clad::CladTimerGroup::CladTimerGroup()
       : m_Tg("Timers for Clad Funcs", "Timers for Clad Funcs") {}
 
-  void clad::CladTimerGroup::StartNewTimer(const llvm::StringRef TimerName,
-                                           const llvm::StringRef TimerDesc) {
+  void clad::CladTimerGroup::StartNewTimer(llvm::StringRef TimerName,
+                                           llvm::StringRef TimerDesc) {
     std::unique_ptr<llvm::Timer> tm =
         std::make_unique<llvm::Timer>(TimerName, TimerDesc, m_Tg);
     Timers.push_back(std::move(tm));
