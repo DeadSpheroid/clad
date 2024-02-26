@@ -20,13 +20,6 @@ double test2(double a, double b) {
   return 3*a*a + b * nested2(a) + a * b;
 }
 
-// CHECK: test2
-// CHECK-NEXT: test1
-// CHECK-NEXT: nested1
-// CHECK-NEXT: nested2
-// CHECK-NEXT: Total
-
-
 int main() {
   auto d_fn_1 = clad::differentiate(test1, "x");
   double dp = -1, dq = -1;

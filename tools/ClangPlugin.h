@@ -64,7 +64,7 @@ namespace clad {
   };
   class CladTimerGroup {
     llvm::TimerGroup m_Tg;
-    std::vector<std::unique_ptr<llvm::Timer>> Timers;
+    std::vector<std::unique_ptr<llvm::Timer>> m_Timers;
 
   public:
     CladTimerGroup();

@@ -319,17 +319,16 @@ namespace clad {
 
   void clad::CladTimerGroup::StartNewTimer(llvm::StringRef TimerName,
                                            llvm::StringRef TimerDesc) {
-    std::unique_ptr<llvm::Timer> tm =
-        std::make_unique<llvm::Timer>(TimerName, TimerDesc, m_Tg);
-    Timers.push_back(std::move(tm));
-    Timers.back()->startTimer();
-    return;
+    std::unique_ptr<llvm::Timer> tm(
+        new llvm::Timer(TimerName, TimerDesc, m_Tg));
+    m_Timers.push_back(std::move(tm));
+    m_Timers.back()->startTimer();
   }
+
   void clad::CladTimerGroup::StopTimer() {
-    Timers.back()->stopTimer();
-    if (Timers.size() != 1)
-      Timers.pop_back();
-    return;
+    m_Timers.back()->stopTimer();
+    if (m_Timers.size() != 1)
+      m_Timers.pop_back();
   }
 
   // Routine to check clang version at runtime against the clang version for
