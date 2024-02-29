@@ -198,15 +198,14 @@ namespace clad {
         // FIXME: Move the timing inside the DerivativeBuilder. This would
         // require to pass in the DifferentiationOptions in the DiffPlan.
         // derive the collected functions
-        
 
-        #if CLANG_VERSION_MAJOR > 11
-          bool WantTiming =
+#if CLANG_VERSION_MAJOR > 11
+        bool WantTiming =
             getenv("LIBCLAD_TIMING") || m_CI.getCodeGenOpts().TimePasses;
-        #else
-          bool WantTiming = 
+#else
+        bool WantTiming =
             getenv("LIBCLAD_TIMING") || m_CI.getFrontendOpts().ShowTimers;
-        #endif
+#endif
 
         auto DFI = m_DFC.Find(request);
         if (DFI.IsValid()) {
@@ -326,16 +325,16 @@ namespace clad {
 
   void clad::CladTimerGroup::StartNewTimer(llvm::StringRef TimerName,
                                            llvm::StringRef TimerDesc) {
-    std::unique_ptr<llvm::Timer> tm(
-        new llvm::Timer(TimerName, TimerDesc, m_Tg));
-    m_Timers.push_back(std::move(tm));
-    m_Timers.back()->startTimer();
+      std::unique_ptr<llvm::Timer> tm(
+          new llvm::Timer(TimerName, TimerDesc, m_Tg));
+      m_Timers.push_back(std::move(tm));
+      m_Timers.back()->startTimer();
   }
 
   void clad::CladTimerGroup::StopTimer() {
-    m_Timers.back()->stopTimer();
-    if (m_Timers.size() != 1)
-      m_Timers.pop_back();
+      m_Timers.back()->stopTimer();
+      if (m_Timers.size() != 1)
+        m_Timers.pop_back();
   }
 
   // Routine to check clang version at runtime against the clang version for
