@@ -656,6 +656,8 @@ namespace clad {
              "nested clad::differentiate/gradient are not yet supported");
       llvm::SaveAndRestore<const FunctionDecl*> saveTopMost = m_TopMostFD;
       m_TopMostFD = FD;
+      llvm::errs()<<"Here is og func decl"<<"\n";
+      derivedFD->print(llvm::errs());
       TraverseDecl(derivedFD);
       m_DiffPlans.push_back(std::move(request));
     }
@@ -665,4 +667,5 @@ namespace clad {
     }*/
     return true;     // return false to abort visiting.
   }
+
 } // end namespace
