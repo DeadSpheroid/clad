@@ -1,7 +1,7 @@
-// RUN: %cladnumdiffclang %s  -I%S/../../include -oGradients.out 2>&1 | FileCheck %s
-// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC %s
+// RUN: %cladnumdiffclang %s  -I%S/../../include -oGradients.out 2>&1 | FileCheck --dump-input=always %s
+// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
 // RUN: %cladnumdiffclang -Xclang -plugin-arg-clad -Xclang -enable-tbr %s  -I%S/../../include -oGradients.out
-// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC %s
+// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
 
 //CHECK-NOT: {{.*error|warning|note:.*}}
 // XFAIL: target={{i586.*}}
@@ -400,7 +400,7 @@ struct S {
   //CHECK-NEXT:       }
   //CHECK-NEXT:   }
 
-  void f_grad(double x, double y, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y);
+  float f_grad(double x, double y, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y);
 };
 
 double sum_of_powers(double x, double y, double z, double p) {

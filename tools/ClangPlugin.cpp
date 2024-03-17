@@ -214,25 +214,60 @@ namespace clad {
             m_CTG.StopTimer();
         }
       }
-      if(request.Mode == DiffMode::reverse){
-        LookupResult R(S, DerivativeDecl->getNameInfo(), Sema::LookupNameKind::LookupAnyName);
-        S.LookupName(R, S.TUScope);
-
+      if(true && request.Mode == DiffMode::reverse){
+        // DerivativeDecl->dump();
+        // llvm::errs()<<"Before"<<"\n";
+        // DeclContextLookupResult dclr =  DerivativeDecl->lookup(DerivativeDecl->getDeclName());
+        // for(auto i = dclr.begin(); i != dclr.end(); i++){
+        //   (*i)->dump();
+        // }
+        // llvm::errs()<<"After"<<"\n";
+        // LookupResult R(S, DerivativeDecl->getNameInfo().getName(),noLoc,  Sema::LookupNameKind::LookupAnyName);
+        // S.LookupQualifiedName(R, m_CI.getASTContext().getTranslationUnitDecl());
+        // LookupResult Q(S, DerivativeDecl->getNameInfo(), Sema::LookupNameKind::LookupMemberName);
+        // S.LookupName(Q, S.TUScope);
+        // if(Q.empty()){
+        //   llvm::errs()<<"Empty Q"<<"\n";
+        // }
+        // else{
+        //   Q.begin()->dump();
+        // }
+        // if(R.empty()){
+        //   auto rd = DerivativeDecl->redecls();
+        //   for(auto i = rd.begin(); i != rd.end(); i++){
+        //   llvm::errs()<<"Not good"<<"\n";
+        //   (*i)->dump();
+        //   }
+        // }
         // R can never be empty and will always contain atleast the generated
         // gradient func
         // If R has a forw decl then compare return types
-        if(!R.isSingleResult()){
-          clang::FunctionDecl* forwDecl = R.begin()->getAsFunction();
-          clang::FunctionDecl* deriv = (++R.begin())->getAsFunction();
-          if(forwDecl->getReturnType() != deriv->getReturnType()){
-            llvm::errs()<<"Forward declaration of gradient has incorrect return type"<<"\n";
-            llvm::errs()<<"Forward decl return type "<<forwDecl->getName()<<" ";
-            forwDecl->getReturnType()->dump();
-            llvm::errs()<<"Expected gradient return type "<<deriv->getName()<<" ";
-            deriv->getReturnType()->dump();
-            assert(false && "Forward declaration of gradient has incorrect return type");
+        auto rd = DerivativeDecl->redecls();
+        
+        if(++rd.begin() == rd.end()){
+          // Either no forward decl, or its a CXXMethodDecl
+          // For the latter we search the CXXRecord for a forw decl
+          if(isa<CXXMethodDecl>(*(rd.begin()))){
+            CXXRecordDecl* cmd = cast<CXXMethodDecl>(DerivativeDecl)->getParent();
+            cmd->dump();
+            auto dclr = cmd->lookup(DerivativeDecl->getDeclName());
+            if(!(++dclr.begin() == dclr.end())){
+              assert((*(dclr.begin()))->getAsFunction()->getReturnType() == ((*(++dclr.begin()))->getAsFunction()->getReturnType()));
+            }
           }
         }
+        // if(!R.empty()){
+            // llvm::errs()<<"In not single"<<"\n";
+            // R.dump();
+            // if(isa<CXXMethodDecl>(*(R.begin()))){
+            //   llvm::errs()<<"Its a cxxmd"<<"\n";
+            // }
+        // }
+      }
+      else{
+        CXXMethodDecl* cmd = cast<CXXMethodDecl>(DerivativeDecl);
+        auto par = cmd->getParent();
+        par->dump();
       }
 
       if (DerivativeDecl) {
