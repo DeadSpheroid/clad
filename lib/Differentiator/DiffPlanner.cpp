@@ -665,5 +665,4 @@ namespace clad {
     }*/
     return true;     // return false to abort visiting.
   }
-
 } // end namespace
