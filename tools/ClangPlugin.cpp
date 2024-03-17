@@ -214,20 +214,25 @@ namespace clad {
             m_CTG.StopTimer();
         }
       }
-      LookupResult R(S, DerivativeDecl->getNameInfo(), Sema::LookupNameKind::LookupUsingDeclName);
-      S.LookupName(R, S.TUScope);
-      if(!R.empty()){
-        clang::FunctionDecl* forwDecl = R.begin()->getAsFunction();
-        if(forwDecl){
-          assert(forwDecl->getReturnType() == DerivativeDecl->getReturnType() && "Forward declaration has incorrect return type");
-          llvm::errs()<<"fwdecl found havinf return type ";
-          forwDecl->getReturnType()->dump();
-          return nullptr;
-        }
-        else{
-          llvm::errs()<<"No forw decl"<<"\n";
-        }
+      if(request.Mode == DiffMode::reverse){
+        LookupResult R(S, DerivativeDecl->getNameInfo(), Sema::LookupNameKind::LookupAnyName);
+        S.LookupName(R, S.TUScope);
 
+        // R can never be empty and will always contain atleast the generated
+        // gradient func
+        // If R has a forw decl then compare return types
+        if(!R.isSingleResult()){
+          clang::FunctionDecl* forwDecl = R.begin()->getAsFunction();
+          clang::FunctionDecl* deriv = (++R.begin())->getAsFunction();
+          if(forwDecl->getReturnType() != deriv->getReturnType()){
+            llvm::errs()<<"Forward declaration of gradient has incorrect return type"<<"\n";
+            llvm::errs()<<"Forward decl return type "<<forwDecl->getName()<<" ";
+            forwDecl->getReturnType()->dump();
+            llvm::errs()<<"Expected gradient return type "<<deriv->getName()<<" ";
+            deriv->getReturnType()->dump();
+            assert(false && "Forward declaration of gradient has incorrect return type");
+          }
+        }
       }
 
       if (DerivativeDecl) {
