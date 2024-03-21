@@ -231,11 +231,11 @@ namespace clad {
         }
         else{
           llvm::errs()<<"not a class method"<<"\n";
-          LookupResult P(S, DerivativeDecl->getDeclName(), noLoc,  Sema::LookupNameKind::LookupAnyName);
+          LookupResult P(S, DerivativeDecl->getDeclName(), noLoc,  Sema::LookupNameKind::LookupUsingDeclName, Sema::RedeclarationKind::ForVisibleRedeclaration);
           S.LookupName(P, S.TUScope);
-          for(auto it = P.begin(); it != P.end(); it++){
-            (*it)->dump();
-          }
+          // for(auto it = P.begin(); it != P.end(); it++){
+          //   (*it)->dump();
+          // }
           // DerivativeDecl->dumpLookups();
           // DerivativeDecl->dump();
           // DeclContextLookupResult DCLR = DerivativeDecl->lookup(DerivativeDecl->getDeclName());
@@ -258,8 +258,8 @@ namespace clad {
           auto forwsignature = forwdecl->parameters();
           assert(derivsignature.size() == forwsignature.size() && "Unequal number of args in forward declaration and generated gradient");
 
-          for(auto it1=derivsignature.begin(), it2=forwsignature.end();it1 != derivsignature.end() && it2 != forwsignature.end();it1++,it2++){
-            assert((*it1)->getType() == (*it2)->getType());
+          for(auto it1=derivsignature.begin(), it2=forwsignature.begin();it1 != derivsignature.end() && it2 != forwsignature.end();it1++,it2++){
+            assert((*it1)->getType() == (*it2)->getType() && "Types of arguments do not match in forward decl");
           }
         }
 
