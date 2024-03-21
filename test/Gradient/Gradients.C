@@ -400,7 +400,7 @@ struct S {
   //CHECK-NEXT:       }
   //CHECK-NEXT:   }
 
-  float f_grad(double x, double y, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y);
+  void f_grad(double x, double y, clad::array_ref<double> _d_x, clad::array_ref<double> _d_y);
 };
 
 double sum_of_powers(double x, double y, double z, double p) {
