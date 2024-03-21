@@ -1,7 +1,7 @@
-// RUN: %cladclang %s -I%S/../../include -oHessians.out 2>&1 | FileCheck  --dump-input=always %s
-// RUN: ./Hessians.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
+// RUN: %cladclang %s -I%S/../../include -oHessians.out 2>&1 | FileCheck  %s
+// RUN: ./Hessians.out | FileCheck -check-prefix=CHECK-EXEC %s
 // RUN: %cladclang -Xclang -plugin-arg-clad -Xclang -enable-tbr %s -I%S/../../include -oHessians.out
-// RUN: ./Hessians.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
+// RUN: ./Hessians.out | FileCheck -check-prefix=CHECK-EXEC %s
 
 //CHECK-NOT: {{.*error|warning|note:.*}}
 // XFAIL: target={{i586.*}}
@@ -145,12 +145,10 @@ struct Experiment {
 
   void someMethod_darg0_grad(double i,
                              double j,
-                             clad::array_ref<Experiment> _d_this,
                              clad::array_ref<double> _d_i,
                              clad::array_ref<double> _d_j);
   void someMethod_darg1_grad(double i,
                              double j,
-                             clad::array_ref<Experiment> _d_this,
                              clad::array_ref<double> _d_i,
                              clad::array_ref<double> _d_j);
 
