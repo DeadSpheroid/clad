@@ -1,7 +1,7 @@
-// RUN: %cladnumdiffclang %s  -I%S/../../include -oGradients.out 2>&1 | FileCheck --dump-input=always %s
-// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
+// RUN: %cladnumdiffclang %s  -I%S/../../include -oGradients.out 2>&1 | FileCheck %s
+// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC %s
 // RUN: %cladnumdiffclang -Xclang -plugin-arg-clad -Xclang -enable-tbr %s  -I%S/../../include -oGradients.out
-// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC --dump-input=always %s
+// RUN: ./Gradients.out | FileCheck -check-prefix=CHECK-EXEC %s
 
 //CHECK-NOT: {{.*error|warning|note:.*}}
 // XFAIL: target={{i586.*}}

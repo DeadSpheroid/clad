@@ -214,82 +214,45 @@ namespace clad {
             m_CTG.StopTimer();
         }
       }
-      if(request.Mode == DiffMode::reverse){
-        llvm::errs()<<"gea"<<"\n";
+
+      // Only verify forward declaration in reverse mode
+      if (request.Mode == DiffMode::reverse) {
         bool hasForwardDecl = false;
         FunctionDecl* deriv = nullptr;
         FunctionDecl* forwdecl = nullptr;
-        if(isa<CXXMethodDecl>(DerivativeDecl)){
-          // Derivative is a class/struct method
-          // Search for forw decl in same scope
-          DeclContextLookupResult DCLR = DerivativeDecl->lookup(DerivativeDecl->getDeclName());
-          if(std::distance(DCLR.begin(), DCLR.end()) >= 2) {
-            hasForwardDecl = true;
-            deriv = (*DCLR.begin())->getAsFunction();
-            forwdecl = (*(++DCLR.begin()))->getAsFunction();
-          }
-        }
-        else{
-          llvm::errs()<<"not a class method"<<"\n";
-          LookupResult P(S, DerivativeDecl->getDeclName(), noLoc,  Sema::LookupNameKind::LookupUsingDeclName, Sema::RedeclarationKind::ForVisibleRedeclaration);
-          S.LookupName(P, S.TUScope);
-          // for(auto it = P.begin(); it != P.end(); it++){
-          //   (*it)->dump();
-          // }
-          // DerivativeDecl->dumpLookups();
-          // DerivativeDecl->dump();
-          // DeclContextLookupResult DCLR = DerivativeDecl->lookup(DerivativeDecl->getDeclName());
-          if(std::distance(P.begin(), P.end()) >= 2){
-            hasForwardDecl = true;
-            llvm::errs()<<"here"<<"\n";
-            deriv = (*P.begin())->getAsFunction();
-            forwdecl = (*(++P.begin()))->getAsFunction();
-          }
+
+        LookupResult P(S, DerivativeDecl->getNameInfo(),
+                       Sema::LookupNameKind::LookupUsingDeclName,
+                       Sema::RedeclarationKind::ForExternalRedeclaration);
+        S.LookupName(P, S.TUScope);
+
+        if (std::distance(P.begin(), P.end()) >= 2) {
+          // Forward declaration found with possibly mismatched signature
+          hasForwardDecl = true;
+          deriv = (*P.begin())->getAsFunction();
+          forwdecl = (*(++P.begin()))->getAsFunction();
         }
 
         // Compare signatures including return type
-        if(hasForwardDecl){
-          llvm::errs()<<"Found forw decl"<<"\n";
-          deriv->dump();
-          forwdecl->dump();
-          assert(deriv->getReturnType() == forwdecl->getReturnType() && "Forward declaration of a gradient must have void return type");
+        if (hasForwardDecl) {
+
+          assert(
+              deriv->getReturnType() == forwdecl->getReturnType() &&
+              "Forward declaration of a gradient must have void return type");
 
           auto derivsignature = deriv->parameters();
           auto forwsignature = forwdecl->parameters();
-          assert(derivsignature.size() == forwsignature.size() && "Unequal number of args in forward declaration and generated gradient");
+          assert(derivsignature.size() == forwsignature.size() &&
+                 "Unequal number of args in forward declaration and generated "
+                 "gradient");
 
-          for(auto it1=derivsignature.begin(), it2=forwsignature.begin();it1 != derivsignature.end() && it2 != forwsignature.end();it1++,it2++){
-            assert((*it1)->getType() == (*it2)->getType() && "Types of arguments do not match in forward decl");
+          for (auto it1 = derivsignature.begin(), it2 = forwsignature.begin();
+               it1 != derivsignature.end() && it2 != forwsignature.end();
+               it1++, it2++) {
+            assert((*it1)->getType() == (*it2)->getType() &&
+                   "Types of arguments do not match in forward decl");
           }
         }
-
-        // DerivativeDecl->dump();
-        // llvm::errs()<<"Before"<<"\n";
-        // DeclContextLookupResult dclr =  DerivativeDecl->lookup(DerivativeDecl->getDeclName());
-        // for(auto i = dclr.begin(); i != dclr.end(); i++){
-        //   (*i)->dump();
-        // }
-        // llvm::errs()<<"After"<<"\n";
-        // LookupResult R(S, DerivativeDecl->getNameInfo().getName(),noLoc,  Sema::LookupNameKind::LookupAnyName);
-        // S.LookupQualifiedName(R, m_CI.getASTContext().getTranslationUnitDecl());
-        // LookupResult Q(S, DerivativeDecl->getNameInfo(), Sema::LookupNameKind::LookupMemberName);
-        // S.LookupName(Q, S.TUScope);
-        // if(Q.empty()){
-        //   llvm::errs()<<"Empty Q"<<"\n";
-        // }
-        // else{
-        //   Q.begin()->dump();
-        // }
-        // if(R.empty()){
-        //   auto rd = DerivativeDecl->redecls();
-        //   for(auto i = rd.begin(); i != rd.end(); i++){
-        //   llvm::errs()<<"Not good"<<"\n";
-        //   (*i)->dump();
-        //   }
-        // }
-        // R can never be empty and will always contain atleast the generated
-        // gradient func
-        // If R has a forw decl then compare return types
       }
 
       if (DerivativeDecl) {
